@@ -21,5 +21,21 @@ class InMemoryRepository {
         return items
     }
 
-    // Add more repository methods for warehouses, locations, etc.
+    fun removeItem(id: Int): Boolean {
+        val item = getItemById(id)
+        if (item != null) {
+            items.remove(item)
+            return true
+        }
+        return false
+    }
+
+    fun updateItem(item: Item): Boolean {
+        val index = items.indexOfFirst { it.id == item.id }
+        if (index >= 0) {
+            items[index] = item
+            return true
+        }
+        return false
+    }
 }

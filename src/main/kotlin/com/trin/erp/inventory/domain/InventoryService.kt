@@ -1,37 +1,38 @@
 package com.trin.erp.inventory.domain
 
+import com.trin.erp.inventory.infra.InMemoryRepository
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 class InventoryService {
-    private val items = mutableListOf<Item>()
+    private val repository = InMemoryRepository()
     private val warehouses = mutableListOf<Warehouse>()
     private val locations = mutableListOf<Location>()
     private val movements = mutableListOf<StockMovement>()
 
     // Menambahkan item baru
     fun addItem(item: Item) {
-        items.add(item)
+        repository.addItem(item)
     }
 
     // Mengambil daftar semua item
     fun getAllItems(): List<Item> {
-        return items
+        return repository.getAllItems()
     }
 
     // Mengupdate item
     fun updateItem(updatedItem: Item) {
-        val itemIndex = items.indexOfFirst { it.id == updatedItem.id }
-        if (itemIndex >= 0) {
-            items[itemIndex] = updatedItem
-        }
+        repository.updateItem(updatedItem)
     }
 
     // Menghapus item
     fun removeItem(id: Int) {
-        items.removeIf { it.id == id }
+        repository.removeItem(id)
     }
 
     // Mengambil item berdasarkan id
     fun getItemById(id: Int): Item? {
-        return items.find { it.id == id }
+        return repository.getItemById(id)
     }
 
     // Menambah stok untuk item tertentu
@@ -40,8 +41,8 @@ class InventoryService {
         item?.increaseStock(quantity)
     }
 
-    // Transfer stok antar gudang
-    fun transferStock(itemId: Int, fromWarehouseId: Int, toWarehouseId: Int, quantity: Int) {
+    // Transfer stok antar lokasi
+    fun transferStock(itemId: Int, sourceLocationId: Int, destLocationId: Int, quantity: Int) {
         val item = getItemById(itemId) ?: throw IllegalArgumentException("Item not found")
         if (item.quantity >= quantity) {
             item.decreaseStock(quantity)
@@ -50,9 +51,9 @@ class InventoryService {
                 itemId = itemId,
                 type = MovementType.TRANSFER,
                 quantity = quantity,
-                date = "2025-11-26", // Gunakan tanggal saat ini
-                sourceLocationId = fromWarehouseId,
-                destLocationId = toWarehouseId
+                date = getCurrentDate(), // Gunakan tanggal saat ini
+                sourceLocationId = sourceLocationId,
+                destLocationId = destLocationId
             )
             movements.add(movement)
         } else {
@@ -62,6 +63,11 @@ class InventoryService {
 
     // Melihat laporan stok item di lokasi tertentu
     fun getStockReport(itemId: Int, warehouseId: Int): Int {
-        return items.filter { it.id == itemId && it.locationId == warehouseId }.sumOf { it.quantity }
+        val item = repository.getItemById(itemId)
+        return if (item != null && item.locationId == warehouseId) item.quantity else 0
+    }
+
+    private fun getCurrentDate(): String {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     }
 }

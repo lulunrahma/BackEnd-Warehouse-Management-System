@@ -40,6 +40,12 @@ class StockService(private val inventoryService: InventoryService) {
         println("Movement registered: $movement")
     }
 
+    // Register movement with StockMovement object
+    fun registerMovement(movement: StockMovement) {
+        movements.add(movement)
+        println("Movement registered: $movement")
+    }
+
     // Mendapatkan semua pergerakan stok
     fun getAllMovements(): List<StockMovement> {
         return movements
@@ -50,5 +56,4 @@ class StockService(private val inventoryService: InventoryService) {
         return movements.find { it.id == id }
     }
 
-    fun registerMovement(itemId: StockMovement) {}
 }

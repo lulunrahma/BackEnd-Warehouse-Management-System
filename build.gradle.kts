@@ -51,7 +51,6 @@ dependencies {
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("io.ktor:ktor-server-cors:2.3.12")
     implementation("dev.hayden:khealth:2.1.1")
 
     // Testing (optional, good practice)

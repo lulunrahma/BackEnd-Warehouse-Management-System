@@ -1,5 +1,6 @@
 package com.trin.erp.inventory
 
+import com.trin.erp.inventory.domain.InventoryService
 import com.trin.erp.inventory.domain.MovementType
 import com.trin.erp.inventory.domain.StockService
 import com.trin.erp.inventory.domain.StockMovement
@@ -8,14 +9,18 @@ import kotlin.test.assertEquals
 
 class StockServiceTest {
 
+    private val inventoryService = InventoryService()
     private val stockService = StockService(
-        inventoryService = TODO()
+        inventoryService = inventoryService
     )
 
     @Test
     fun `should register stock movement successfully`() {
         val movement = StockMovement(
-            1, 5, MovementType.IN, 10,
+            id = 1,
+            itemId = 5,
+            type = MovementType.IN,
+            quantity = 10,
             date = "19-05-2020",
             sourceLocationId = 5,
             destLocationId = 7
@@ -29,13 +34,19 @@ class StockServiceTest {
     @Test
     fun `should get all stock movements successfully`() {
         val movement1 = StockMovement(
-            1, 5, MovementType.IN, 10,
+            id = 1,
+            itemId = 5,
+            type = MovementType.IN,
+            quantity = 10,
             date = "12-09-2025",
             sourceLocationId = 1,
             destLocationId = 2
         )
         val movement2 = StockMovement(
-            2, 6, MovementType.OUT, 5,
+            id = 2,
+            itemId = 6,
+            type = MovementType.OUT,
+            quantity = 5,
             date = "20-09-2023",
             sourceLocationId = 4,
             destLocationId = 7
@@ -50,7 +61,10 @@ class StockServiceTest {
     @Test
     fun `should get movement by ID`() {
         val movement = StockMovement(
-            1, 5, MovementType.IN, 10,
+            id = 1,
+            itemId = 5,
+            type = MovementType.IN,
+            quantity = 10,
             date = "12-05-2025",
             sourceLocationId = 1,
             destLocationId = 2

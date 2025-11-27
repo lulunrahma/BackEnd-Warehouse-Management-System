@@ -22,7 +22,8 @@ fun Route.inventoryRoutes(inventoryService: InventoryService) {
 
     get("/items") {
         println("Request received for /items") // Log tambahan
-        call.respond(HttpStatusCode.OK, "Items List")
+        val items = inventoryService.getAllItems()
+        call.respond(HttpStatusCode.OK, items)
     }
 
     get("/items/{id}") {
