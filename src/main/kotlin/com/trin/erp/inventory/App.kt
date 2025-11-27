@@ -3,7 +3,6 @@ package com.trin.erp.inventory
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import org.koin.core.context.startKoin
-import org.koin.core.context.GlobalContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import com.trin.erp.inventory.api.inventoryRoutes
@@ -21,11 +20,9 @@ val appModule: Module = module {
 }
 
 fun Application.module() {
-    // Inisialisasi Koin hanya jika belum diinisialisasi
-    if (GlobalContext.getOrNull() == null) {
-        startKoin {
-            modules(appModule)  // Menyuntikkan modul Koin
-        }
+    // Inisialisasi Koin
+    startKoin {
+        modules(appModule)  // Menyuntikkan modul Koin
     }
 
     install(ContentNegotiation) {
