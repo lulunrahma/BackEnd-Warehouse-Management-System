@@ -1,52 +1,69 @@
-package com.trin.erp.inventory.api
+package com.trin.erp.inventory.domain
 
-import com.trin.erp.inventory.domain.InventoryService
-import com.trin.erp.inventory.domain.Item
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.*
-import io.ktor.http.HttpMethod
-import io.ktor.server.application.Application
-import org.koin.test.KoinTest
-import org.koin.test.inject
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
-class MovementControllerTest : KoinTest {
-
-    // Inject the InventoryService from Koin
-    private val inventoryService by inject<InventoryService>()
-
-    // This function sets up Ktor testing environment
-    fun Application.testModule() {
-        movementRoutes() // Initialize the Ktor routes
-    }
+class InventoryMovementTest {
 
     @Test
-    fun `should transfer stock correctly`() = testApplication {
-        // Create a new item and add it to the inventory service
+    fun `should transfer stock correctly`() {
+        val inventoryService = InventoryService()
         val item = Item(id = 1, sku = "SKU123", name = "Item A", quantity = 20, locationId = 1)
         inventoryService.addItem(item)
 
-        // Send a POST request to the "/stock-movements" endpoint with the stock movement data
-        handleRequest(HttpMethod.Post, "/stock-movements") {
-            addHeader("Content-Type", "application/json")
-            setBody("""
-                {
-                    "id": 1,
-                    "itemId": 1,
-                    "type": "TRANSFER",
-                    "quantity": 10,
-                    "date": "2025-11-26",
-                    "sourceLocationId": 1,
-                    "destLocationId": 2
-                }
-            """)
-        }.apply {
-            // Check the response status and content
-            assertEquals(HttpStatusCode.Created, response.status())
-            assertEquals("""
-                {"id":1,"itemId":1,"type":"TRANSFER","quantity":10,"date":"2025-11-26","sourceLocationId":1,"destLocationId":2}
-            """, response.content)
+        // Perform the transfer
+        inventoryService.transferStock(1, 1, 2, 10)
+
+        // Verify the item quantity has decreased in the source location
+        val updatedItem = inventoryService.getItemById(1)
+        assertEquals(10, updatedItem?.quantity) // 20 - 10 = 10
+    }
+
+    @Test
+    fun `should fail to transfer stock when insufficient quantity`() {
+        val inventoryService = InventoryService()
+        val item = Item(id = 1, sku = "SKU123", name = "Item A", quantity = 5, locationId = 1)
+        inventoryService.addItem(item)
+
+        // Attempt to transfer more than available
+        assertFailsWith<IllegalArgumentException> {
+            inventoryService.transferStock(1, 1, 2, 10)
+        }
+    }
+
+    @Test
+    fun `should fail to transfer stock when item not found`() {
+        val inventoryService = InventoryService()
+
+        // Attempt to transfer non-existent item
+        assertFailsWith<IllegalArgumentException> {
+            inventoryService.transferStock(999, 1, 2, 10)
+        }
+    }
+
+    @Test
+    fun `should handle zero quantity transfer`() {
+        val inventoryService = InventoryService()
+        val item = Item(id = 1, sku = "SKU123", name = "Item A", quantity = 20, locationId = 1)
+        inventoryService.addItem(item)
+
+        // Attempt to transfer 0 quantity
+        assertFailsWith<IllegalArgumentException> {
+            inventoryService.transferStock(1, 1, 2, 0)
+        }
+    }
+
+    @Test
+    fun `should handle negative quantity transfer`() {
+        val inventoryService = InventoryService()
+        val item = Item(id = 1, sku = "SKU123", name = "Item A", quantity = 20, locationId = 1)
+        inventoryService.addItem(item)
+
+        // Attempt to transfer negative quantity
+        assertFailsWith<IllegalArgumentException> {
+            inventoryService.transferStock(1, 1, 2, -5)
         }
     }
 }

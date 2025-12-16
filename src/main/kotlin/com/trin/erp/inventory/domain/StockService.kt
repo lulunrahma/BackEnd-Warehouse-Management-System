@@ -3,6 +3,7 @@ package com.trin.erp.inventory.domain
 class StockService(private val inventoryService: InventoryService) {
 
     private val movements = mutableListOf<StockMovement>()
+
     // Menambah stok barang masuk
     fun addStock(itemId: Int, quantity: Int) {
         val item = inventoryService.getItemById(itemId)
@@ -22,6 +23,8 @@ class StockService(private val inventoryService: InventoryService) {
             throw IllegalArgumentException("Item not found")
         }
     }
+
+    // Register movement with all parameters
     fun registerMovement(itemId: Int, type: String, quantity: Int, date: String, sourceLocationId: Int, destLocationId: Int) {
         // Membuat objek StockMovement dengan data yang diberikan
         val movement = StockMovement(
@@ -50,5 +53,9 @@ class StockService(private val inventoryService: InventoryService) {
         return movements.find { it.id == id }
     }
 
-    fun registerMovement(itemId: StockMovement) {}
+    // New function with different signature to register a StockMovement object directly
+    fun registerMovementObject(movement: StockMovement) {
+        movements.add(movement)
+        println("Movement object registered: $movement")
+    }
 }
