@@ -2,12 +2,12 @@ package com.trin.erp.inventory.api
 
 import com.trin.erp.inventory.domain.InventoryService
 import com.trin.erp.inventory.domain.Item
-import io.ktor.application.Application
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
 import io.ktor.server.testing.*
-import org.koin.ktor.ext.inject
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ItemControllerTest : KoinTest {

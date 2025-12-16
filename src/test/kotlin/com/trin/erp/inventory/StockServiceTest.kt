@@ -8,9 +8,7 @@ import kotlin.test.assertEquals
 
 class StockServiceTest {
 
-    private val stockService = StockService(
-        inventoryService = TODO()
-    )
+    private val stockService = StockService()
 
     @Test
     fun `should register stock movement successfully`() {
